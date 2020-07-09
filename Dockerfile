@@ -29,7 +29,7 @@ RUN cd /sourcetmp && \
 RUN mkdir /var/log/nginx /var/cache/nginx
 
 RUN cd /sourcetmp && \
-    wget -q https://nginx.org/download/nginx-1.19.0.tar.gz && tar xzf nginx-1.19.0.tar.gz && cd nginx-1.19.0 && ./configure \
+    wget -q https://nginx.org/download/nginx-1.19.1.tar.gz && tar xzf nginx-1.19.1.tar.gz && cd nginx-1.19.1 && ./configure \
       --prefix=/etc/nginx \
       --with-cc-opt="-O3 -fPIE -fstack-protector-strong -Wformat -Werror=format-security" \
       --with-ld-opt="-Wl,-Bsymbolic-functions -Wl,-z,relro" \
