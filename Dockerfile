@@ -1,25 +1,41 @@
-FROM debian:buster
+FROM debian:bullseye
 MAINTAINER Martin Venuš <martin.venus@neatous.cz>
 
 RUN apt-get update && \
     apt-get -y purge openssl && \
     apt-get -y install \
                build-essential \
+               cmake \
+               git \
                gnupg2 \
+               golang \
                gzip \
                libbz2-dev \
                libpcre3 \
                libpcre3-dev \
                libssl-dev \
+               mercurial \
                tar \
                wget \
                zlib1g-dev
 
 RUN mkdir /sourcetmp
 
-RUN cd /sourcetmp && \
-    wget https://www.openssl.org/source/openssl-1.1.1h.tar.gz && \
-    tar -xzvf openssl-1.1.1h.tar.gz
+# build boringssl
+RUN mkdir /sourcetmp/boringssl && \
+	cd /sourcetmp && \
+	git clone --depth=1 https://github.com/google/boringssl.git && \
+	cd boringssl && \
+	mkdir build  && \
+	cd build  && \
+	cmake .. && \
+	make
+	
+RUN	mkdir -p /sourcetmp/boringssl/.openssl/lib && \
+	cp /sourcetmp/boringssl/build/crypto/libcrypto.a /sourcetmp/boringssl/build/ssl/libssl.a /sourcetmp/boringssl/.openssl/lib && \
+	cd /sourcetmp/boringssl/.openssl && \
+	ln -s ../include . && \
+	touch /sourcetmp/boringssl/.openssl/include/openssl/ssl.h
 
 RUN cd /sourcetmp && \
     wget -q -O headers-more-nginx-module.tar.gz https://github.com/openresty/headers-more-nginx-module/archive/v0.33.tar.gz && \
@@ -29,12 +45,16 @@ RUN cd /sourcetmp && \
 RUN mkdir /var/log/nginx /var/cache/nginx
 
 RUN cd /sourcetmp && \
-    wget -q https://nginx.org/download/nginx-1.19.3.tar.gz && tar xzf nginx-1.19.3.tar.gz && cd nginx-1.19.3 && ./configure \
+	hg clone -b quic https://hg.nginx.org/nginx-quic
+	
+RUN cd /sourcetmp/nginx-quic/ && \
+	./auto/configure \
       --prefix=/etc/nginx \
-      --with-cc-opt="-O3 -fPIE -fstack-protector-strong -Wformat -Werror=format-security" \
-      --with-ld-opt="-Wl,-Bsymbolic-functions -Wl,-z,relro" \
-      --with-openssl-opt="no-weak-ssl-ciphers no-ssl3 no-shared $ecflag -DOPENSSL_NO_HEARTBEATS -fstack-protector-strong" \
-      --with-openssl="/sourcetmp/openssl-1.1.1h" \
+      --with-http_v3_module --with-http_quic_module --with-stream_quic_module \
+      --with-cc-opt="-O3 -fPIE -fstack-protector-strong -Wformat -Werror=format-security -I../boringssl/include"   \
+      --with-ld-opt="-Wl,-Bsymbolic-functions -Wl,-z,relro \
+					 -L../boringssl/build/ssl  \
+                     -L../boringssl/build/crypto" \
       --sbin-path=/usr/sbin/nginx \
       --modules-path=/usr/lib/nginx/modules \
       --conf-path=/etc/nginx/nginx.conf \
@@ -85,9 +105,12 @@ RUN ln -sf /dev/stdout /var/log/nginx/access.log && \
 
 RUN rm /etc/nginx/nginx.conf
 
-RUN apt-get -y purge \
+RUN apt-get -y remove --purge \
                build-essential \
-               wget
+               cmake \
+               git \
+               golang \
+               mercurial
 
 RUN apt-get -y autoremove
 
