@@ -1,4 +1,4 @@
-FROM debian:buster
+FROM debian:bullseye
 MAINTAINER Martin Venuš <martin.venus@neatous.cz>
 
 RUN apt-get update && \
