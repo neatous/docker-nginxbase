@@ -22,9 +22,9 @@ RUN cd /sourcetmp && \
     tar -xzvf openssl-3.0.5.tar.gz
 
 RUN cd /sourcetmp && \
-    wget -q -O headers-more-nginx-module.tar.gz https://github.com/openresty/headers-more-nginx-module/archive/v0.33.tar.gz && \
+    wget -q -O headers-more-nginx-module.tar.gz https://github.com/openresty/headers-more-nginx-module/archive/v0.34.tar.gz && \
     tar xzf headers-more-nginx-module.tar.gz && \
-    cd headers-more-nginx-module-0.33
+    cd headers-more-nginx-module-0.34
 
 RUN mkdir /var/log/nginx /var/cache/nginx
 
@@ -74,7 +74,7 @@ RUN cd /sourcetmp && \
       --with-compat \
       --with-file-aio \
       --with-http_v2_module \
-      --add-module=/sourcetmp/headers-more-nginx-module-0.33 && \
+      --add-module=/sourcetmp/headers-more-nginx-module-0.34 && \
     make -j ${NB_CORES} && \
     make install && \
     make clean
