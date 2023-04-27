@@ -18,8 +18,8 @@ RUN apt-get update && \
 RUN mkdir /sourcetmp
 
 RUN cd /sourcetmp && \
-    wget https://www.openssl.org/source/openssl-3.0.7.tar.gz && \
-    tar -xzvf openssl-3.0.7.tar.gz
+    wget https://www.openssl.org/source/openssl-3.1.0.tar.gz && \
+    tar -xzvf openssl-3.1.0.tar.gz
 
 RUN cd /sourcetmp && \
     wget -q -O headers-more-nginx-module.tar.gz https://github.com/openresty/headers-more-nginx-module/archive/v0.34.tar.gz && \
@@ -34,7 +34,7 @@ RUN cd /sourcetmp && \
       --with-cc-opt="-O3 -fPIE -fstack-protector-strong -Wformat -Werror=format-security" \
       --with-ld-opt="-Wl,-Bsymbolic-functions -Wl,-z,relro" \
       --with-openssl-opt="no-weak-ssl-ciphers no-ssl3 no-shared $ecflag -DOPENSSL_NO_HEARTBEATS -fstack-protector-strong" \
-      --with-openssl="/sourcetmp/openssl-3.0.7" \
+      --with-openssl="/sourcetmp/openssl-3.1.0" \
       --sbin-path=/usr/sbin/nginx \
       --modules-path=/usr/lib/nginx/modules \
       --conf-path=/etc/nginx/nginx.conf \
