@@ -29,12 +29,12 @@ RUN cd /sourcetmp && \
 RUN mkdir /var/log/nginx /var/cache/nginx
 
 RUN cd /sourcetmp && \
-    wget -q https://nginx.org/download/nginx-1.24.0.tar.gz && tar xzf nginx-1.24.0.tar.gz && cd nginx-1.24.0 && ./configure \
+    wget -q https://nginx.org/download/nginx-1.25.2.tar.gz && tar xzf nginx-1.25.2.tar.gz && cd nginx-1.25.2 && ./configure \
       --prefix=/etc/nginx \
       --with-cc-opt="-O3 -fPIE -fstack-protector-strong -Wformat -Werror=format-security" \
       --with-ld-opt="-Wl,-Bsymbolic-functions -Wl,-z,relro" \
       --with-openssl-opt="no-weak-ssl-ciphers no-ssl3 no-shared $ecflag -DOPENSSL_NO_HEARTBEATS -fstack-protector-strong" \
-      --with-openssl="/sourcetmp/openssl-3.1.0" \
+      --with-openssl="/sourcetmp/openssl-3.1.2" \
       --sbin-path=/usr/sbin/nginx \
       --modules-path=/usr/lib/nginx/modules \
       --conf-path=/etc/nginx/nginx.conf \
