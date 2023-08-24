@@ -18,8 +18,8 @@ RUN apt-get update && \
 RUN mkdir /sourcetmp
 
 RUN cd /sourcetmp && \
-    wget https://www.openssl.org/source/openssl-3.1.0.tar.gz && \
-    tar -xzvf openssl-3.1.0.tar.gz
+    wget https://www.openssl.org/source/openssl-3.1.2.tar.gz && \
+    tar -xzvf openssl-3.1.2.tar.gz
 
 RUN cd /sourcetmp && \
     wget -q -O headers-more-nginx-module.tar.gz https://github.com/openresty/headers-more-nginx-module/archive/v0.34.tar.gz && \
