@@ -1,4 +1,4 @@
-FROM debian:bullseye
+FROM debian:bookworm
 MAINTAINER Martin Venuš <martin.venus@neatous.cz>
 
 RUN apt-get update && \
