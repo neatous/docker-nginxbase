@@ -1,6 +1,11 @@
 FROM debian:bookworm
 MAINTAINER Martin Venuš <martin.venus@neatous.cz>
 
+ENV NGINX_VERSION 1.25.3
+ENV OPENSSL_VERSION 3.1.4
+ENV NGINX_HEADERS_MODULE_VERSION 0.35
+
+
 RUN apt-get update && \
     apt-get -y purge openssl && \
     apt-get -y install \
@@ -18,23 +23,23 @@ RUN apt-get update && \
 RUN mkdir /sourcetmp
 
 RUN cd /sourcetmp && \
-    wget https://www.openssl.org/source/openssl-3.1.3.tar.gz && \
-    tar -xzvf openssl-3.1.3.tar.gz
+    wget https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz && \
+    tar -xzvf openssl-${OPENSSL_VERSION}.tar.gz
 
 RUN cd /sourcetmp && \
-    wget -q -O headers-more-nginx-module.tar.gz https://github.com/openresty/headers-more-nginx-module/archive/v0.34.tar.gz && \
+    wget -q -O headers-more-nginx-module.tar.gz https://github.com/openresty/headers-more-nginx-module/archive/v${NGINX_HEADERS_MODULE_VERSION}.tar.gz && \
     tar xzf headers-more-nginx-module.tar.gz && \
-    cd headers-more-nginx-module-0.34
+    cd headers-more-nginx-module-${NGINX_HEADERS_MODULE_VERSION}
 
 RUN mkdir /var/log/nginx /var/cache/nginx
 
 RUN cd /sourcetmp && \
-    wget -q https://nginx.org/download/nginx-1.25.2.tar.gz && tar xzf nginx-1.25.2.tar.gz && cd nginx-1.25.2 && ./configure \
+    wget -q https://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz && tar xzf nginx-${NGINX_VERSION}.tar.gz && cd nginx-${NGINX_VERSION} && ./configure \
       --prefix=/etc/nginx \
       --with-cc-opt="-O3 -fPIE -fstack-protector-strong -Wformat -Werror=format-security" \
       --with-ld-opt="-Wl,-Bsymbolic-functions -Wl,-z,relro" \
       --with-openssl-opt="no-weak-ssl-ciphers no-ssl3 no-shared $ecflag -DOPENSSL_NO_HEARTBEATS -fstack-protector-strong" \
-      --with-openssl="/sourcetmp/openssl-3.1.3" \
+      --with-openssl="/sourcetmp/openssl-${OPENSSL_VERSION}" \
       --sbin-path=/usr/sbin/nginx \
       --modules-path=/usr/lib/nginx/modules \
       --conf-path=/etc/nginx/nginx.conf \
@@ -74,7 +79,8 @@ RUN cd /sourcetmp && \
       --with-compat \
       --with-file-aio \
       --with-http_v2_module \
-      --add-module=/sourcetmp/headers-more-nginx-module-0.34 && \
+      --with-http_v3_module \
+      --add-module=/sourcetmp/headers-more-nginx-module-${NGINX_HEADERS_MODULE_VERSION} && \
     make -j ${NB_CORES} && \
     make install && \
     make clean
