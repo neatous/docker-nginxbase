@@ -1,9 +1,9 @@
 FROM debian:bookworm
 MAINTAINER Martin Venuš <martin.venus@neatous.cz>
 
-ENV NGINX_VERSION 1.25.3
-ENV OPENSSL_VERSION 3.1.4
-ENV NGINX_HEADERS_MODULE_VERSION 0.35
+ENV NGINX_VERSION 1.29.0
+ENV LIBRESSL_VERSION 4.1.0
+ENV NGINX_HEADERS_MODULE_VERSION 0.39
 
 
 RUN apt-get update && \
@@ -23,8 +23,9 @@ RUN apt-get update && \
 RUN mkdir /sourcetmp
 
 RUN cd /sourcetmp && \
-    wget https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz && \
-    tar -xzvf openssl-${OPENSSL_VERSION}.tar.gz
+	wget https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-${LIBRESSL_VERSION}.tar.gz && \
+    tar -xzvf libressl-${LIBRESSL_VERSION}.tar.gz && \
+	tar -xzvf libressl-${LIBRESSL_VERSION}.tar.gz
 
 RUN cd /sourcetmp && \
     wget -q -O headers-more-nginx-module.tar.gz https://github.com/openresty/headers-more-nginx-module/archive/v${NGINX_HEADERS_MODULE_VERSION}.tar.gz && \
@@ -39,7 +40,7 @@ RUN cd /sourcetmp && \
       --with-cc-opt="-O3 -fPIE -fstack-protector-strong -Wformat -Werror=format-security" \
       --with-ld-opt="-Wl,-Bsymbolic-functions -Wl,-z,relro" \
       --with-openssl-opt="no-weak-ssl-ciphers no-ssl3 no-shared $ecflag -DOPENSSL_NO_HEARTBEATS -fstack-protector-strong" \
-      --with-openssl="/sourcetmp/openssl-${OPENSSL_VERSION}" \
+      --with-openssl="/sourcetmp/libressl-${LIBRESSL_VERSION}" \
       --sbin-path=/usr/sbin/nginx \
       --modules-path=/usr/lib/nginx/modules \
       --conf-path=/etc/nginx/nginx.conf \
